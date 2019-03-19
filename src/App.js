@@ -1,10 +1,12 @@
 import React, { Component } from "react";
 import "./App.css";
 import Sound from "react-sound";
+import CircularProgressbar from "react-circular-progressbar";
+import "react-circular-progressbar/dist/styles.css";
 
 var taskTime = 1200;
 var breakTime = 300;
-var interval
+var interval = function() {};
 
 class App extends Component {
   state = {
@@ -33,7 +35,7 @@ class App extends Component {
   startTicking() {
     this.setState({
       hasStarted: true,
-      soundRisePlaying: "PLAYING",
+      soundRisePlaying: "PLAYING"
     });
 
     this.interval = setInterval(() => {
@@ -96,7 +98,7 @@ class App extends Component {
       controlButton = (
         <button
           onClick={() => this.startTicking()}
-          class="p-2 bg-grey-light rounded"
+          className="p-2 bg-grey-light rounded"
         >
           Start
         </button>
@@ -106,7 +108,7 @@ class App extends Component {
         controlButton = (
           <button
             onClick={() => this.togglePause()}
-            class="p-2 bg-grey-light rounded"
+            className="p-2 bg-grey-light rounded"
           >
             {this.pauseButtonText()}
           </button>
@@ -114,11 +116,21 @@ class App extends Component {
       } else {
         if (this.state.breakMode) {
           controlButton = (
-            <button onClick={() => this.restartTimer(false)}>Start</button>
+            <button
+              onClick={() => this.restartTimer(false)}
+              className="p-2 bg-grey-light rounded"
+            >
+              Start
+            </button>
           );
         } else {
           controlButton = (
-            <button onClick={() => this.restartTimer(true)}>Start break</button>
+            <button
+              onClick={() => this.restartTimer(true)}
+              className="p-2 bg-grey-light rounded"
+            >
+              Start break
+            </button>
           );
         }
       }
@@ -130,7 +142,7 @@ class App extends Component {
       restartButton = (
         <button
           onClick={() => this.restartTimer(this.state.breakMode)}
-          class="p-2 bg-red rounded text-white ml-2"
+          className="p-2 bg-red rounded text-white ml-2"
         >
           Restart
         </button>
@@ -147,10 +159,12 @@ class App extends Component {
 
     return (
       <div className="flex flex-col items-center">
-        <div>{statusText}</div>
-        <div className="text-5xl py-4">
-          {this.hhmmss(this.state.timeRemaining)}
-        </div>
+        <CircularProgressbar
+          className="h-48 w-48 mb-4"
+          text={this.hhmmss(this.state.timeRemaining)}
+          percentage={(this.state.timeRemaining / taskTime) * 100}
+          initialAnimation={true}
+        />
         <div className="flex flex-row items-center">
           {controlButton}
           {restartButton}
