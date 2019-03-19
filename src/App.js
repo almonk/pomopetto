@@ -1,12 +1,12 @@
 import React, { Component } from "react";
-import "./App.css";
 import Sound from "react-sound";
 import CircularProgressbar from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
+import "./App.css";
 
 var taskTime = 1200;
 var breakTime = 300;
-var interval = function() {};
+var interval;
 
 class App extends Component {
   state = {
@@ -91,74 +91,40 @@ class App extends Component {
     return `${this.pad(hours)}:${this.pad(minutes)}:${this.pad(secs)}`;
   }
 
-  render() {
-    let controlButton;
-
+  // Inline components
+  controlButtons() {
+    var btnClasses = "bg-grey-light text-black text-sm rounded px-4 py-2"
     if (!this.state.hasStarted) {
-      controlButton = (
-        <button
-          onClick={() => this.startTicking()}
-          className="p-2 bg-grey-light rounded"
-        >
-          Start
-        </button>
+      return (
+        <div className="flex flex-row">
+          <button className={btnClasses} onClick={() => this.startTicking()}>Start</button>
+        </div>
       );
-    } else {
-      if (this.state.timeRemaining !== 0) {
-        controlButton = (
-          <button
-            onClick={() => this.togglePause()}
-            className="p-2 bg-grey-light rounded"
-          >
-            {this.pauseButtonText()}
+    }
+
+    if (this.state.hasStarted && !this.state.isPaused) {
+      return (
+        <div className="flex flex-row">
+          <button className={btnClasses} onClick={() => this.togglePause()}>
+            Pause
           </button>
-        );
-      } else {
-        if (this.state.breakMode) {
-          controlButton = (
-            <button
-              onClick={() => this.restartTimer(false)}
-              className="p-2 bg-grey-light rounded"
-            >
-              Start
-            </button>
-          );
-        } else {
-          controlButton = (
-            <button
-              onClick={() => this.restartTimer(true)}
-              className="p-2 bg-grey-light rounded"
-            >
-              Start break
-            </button>
-          );
-        }
-      }
-    }
-
-    let restartButton;
-
-    if (this.state.isPaused && this.state.hasStarted) {
-      restartButton = (
-        <button
-          onClick={() => this.restartTimer(this.state.breakMode)}
-          className="p-2 bg-red rounded text-white ml-2"
-        >
-          Restart
-        </button>
+        </div>
       );
     }
 
-    let statusText;
-
-    if (this.state.breakMode) {
-      statusText = "Take a break";
-    } else {
-      statusText = "Do some work!";
+    if (this.state.hasStarted && this.state.isPaused) {
+      return (
+        <div className="flex flex-row">
+          <button className={btnClasses} onClick={() => this.togglePause()}>Resume</button>
+          <button className={btnClasses + " ml-2 bg-red text-white"} onClick={() => this.restartTimer()}>Restart</button>
+        </div>
+      );
     }
+  }
 
+  render() {
     return (
-      <div className="flex flex-col items-center">
+      <div className="flex flex-col items-center shadow-md px-8 py-8 pb-6 rounded-lg">
         <CircularProgressbar
           className="h-48 w-48 mb-4"
           text={this.hhmmss(this.state.timeRemaining)}
@@ -166,8 +132,7 @@ class App extends Component {
           initialAnimation={true}
         />
         <div className="flex flex-row items-center">
-          {controlButton}
-          {restartButton}
+          {this.controlButtons()}
         </div>
         <Sound
           url="./sounds/rise.wav"
