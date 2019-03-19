@@ -4,13 +4,16 @@ import Sound from "react-sound";
 
 var taskTime = 1200;
 var breakTime = 300;
+var interval
 
 class App extends Component {
   state = {
     timeRemaining: taskTime,
     isPaused: false,
     hasStarted: false,
-    breakMode: false
+    breakMode: false,
+    soundRisePlaying: false,
+    soundTickingPlaying: false
   };
 
   // Setup
@@ -28,14 +31,19 @@ class App extends Component {
   // Actions
 
   startTicking() {
-    this.setState({ hasStarted: true });
+    this.setState({
+      hasStarted: true,
+      soundRisePlaying: "PLAYING",
+    });
 
-    setInterval(() => {
+    this.interval = setInterval(() => {
       this.tick();
     }, 1000);
   }
 
   restartTimer(breakMode) {
+    clearInterval(this.interval);
+
     let timeRemaining;
     if (breakMode) {
       timeRemaining = breakTime;
@@ -47,7 +55,9 @@ class App extends Component {
       breakMode: breakMode,
       isPaused: false,
       hasStarted: false,
-      timeRemaining: timeRemaining
+      timeRemaining: timeRemaining,
+      soundRisePlaying: false,
+      soundTickingPlaying: false
     });
   }
 
@@ -104,7 +114,7 @@ class App extends Component {
       } else {
         if (this.state.breakMode) {
           controlButton = (
-            <button onClick={() => this.restartTimer(false)}>Start task</button>
+            <button onClick={() => this.restartTimer(false)}>Start</button>
           );
         } else {
           controlButton = (
@@ -130,26 +140,35 @@ class App extends Component {
     let statusText;
 
     if (this.state.breakMode) {
-      statusText = "Break time!";
+      statusText = "Take a break";
     } else {
       statusText = "Do some work!";
-    }
-
-    let ifTicking;
-
-    if (this.state.hasStarted && !this.state.isPaused) {
-      ifTicking = <Sound url="./sounds/tick.wav" playStatus={"PLAYING"} />;
     }
 
     return (
       <div className="flex flex-col items-center">
         <div>{statusText}</div>
-        <div className="text-5xl py-4">{this.hhmmss(this.state.timeRemaining)}</div>
+        <div className="text-5xl py-4">
+          {this.hhmmss(this.state.timeRemaining)}
+        </div>
         <div className="flex flex-row items-center">
           {controlButton}
           {restartButton}
         </div>
-        {ifTicking}
+        <Sound
+          url="./sounds/rise.wav"
+          playStatus={this.state.soundRisePlaying}
+          onFinishedPlaying={() =>
+            this.setState({
+              soundRisePlaying: false,
+              soundTickingPlaying: "PLAYING"
+            })
+          }
+        />
+        <Sound
+          url="./sounds/tick.wav"
+          playStatus={this.state.soundTickingPlaying}
+        />
       </div>
     );
   }
