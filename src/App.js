@@ -6,6 +6,7 @@ import "./App.css";
 
 var taskTime = 1200;
 var breakTime = 300;
+// eslint-disable-next-line
 var interval;
 
 class App extends Component {
@@ -14,13 +15,16 @@ class App extends Component {
     isPaused: false,
     hasStarted: false,
     breakMode: false,
-    soundRisePlaying: false,
     soundTickingPlaying: false
   };
 
   // Setup
 
   componentDidMount() {}
+
+  componentDidUpdate() {
+    document.title = this.hhmmss(this.state.timeRemaining);
+  }
 
   tick() {
     if (!this.state.isPaused && this.state.hasStarted) {
@@ -35,7 +39,7 @@ class App extends Component {
   startTicking() {
     this.setState({
       hasStarted: true,
-      soundRisePlaying: "PLAYING"
+      soundTickingPlaying: "PLAYING"
     });
 
     this.interval = setInterval(() => {
@@ -134,16 +138,6 @@ class App extends Component {
         <div className="flex flex-row items-center">
           {this.controlButtons()}
         </div>
-        <Sound
-          url="./sounds/rise.wav"
-          playStatus={this.state.soundRisePlaying}
-          onFinishedPlaying={() =>
-            this.setState({
-              soundRisePlaying: false,
-              soundTickingPlaying: "PLAYING"
-            })
-          }
-        />
         <Sound
           url="./sounds/tick.wav"
           playStatus={this.state.soundTickingPlaying}
